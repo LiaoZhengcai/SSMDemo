@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssm.dao.OrdersMapper">
+    <resultMap id="orderMap" type="orders">
+        <id column="oid" property="oid"></id>
+        <result column="oname" property="oname"></result>
+        <result column="otime" property="otime"></result>
+<!--        <result column="id" property="user.id"></result>-->
+<!--        <result column="username" property="user.username"></result>-->
+<!--        <result column="password" property="user.password"></result>-->
+        <association property="user" javaType="user">
+            <result column="id" property="id"></result>
+            <result column="username" property="username"></result>
+            <result column="password" property="password"></result>
+        </association>
+    </resultMap>
+    <select id="findOrder" resultMap="orderMap">
+        select * from orders o,user u where u.id = o.uid
+    </select>
+</mapper>
+

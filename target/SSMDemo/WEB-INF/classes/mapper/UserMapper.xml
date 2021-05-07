@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssm.dao.UserMapper">
+    <select id="findAll" resultType="user">
+        select * from user
+    </select>
+
+    <insert id="addUser" parameterType="user">
+        insert into user values(#{id},#{username},#{password})
+    </insert>
+
+    <delete id="delUser" parameterType="int">
+        delete from user where id=#{id}
+    </delete>
+
+    <update id="updateUser" parameterType="user">
+        update user set username=#{username},password=#{password} where id=#{id}
+    </update>
+
+    <!-- Sql if判断 -->
+    <select id="findByCondition" resultType="user" parameterType="user">
+        select * from user
+        <where>
+            <if test="id!=0">
+                and id = #{id}
+            </if>
+            <if test="username!=null">
+                and username = #{username}
+            </if>
+            <if test="password!=null">
+                and password = #{password}
+            </if>
+        </where>
+    </select>
+
+    <!-- Sql foreach -->
+    <select id="findByIds" resultType="user" parameterType="int[]">
+        select * from user
+        <where>
+            <foreach collection="array" open="id in(" close=")" item="ids" separator=",">
+                #{ids}
+            </foreach>
+        </where>
+    </select>
+    <!-- 查询所有用户下的几个订单，实现一对多 -->
+    <resultMap id="userMapper" type="user">
+        <result column="id" property="id"></result>
+        <result column="username" property="username"></result>
+        <result column="password" property="password"></result>
+        <collection property="ordersList" ofType="orders">
+            <id column="oid" property="oid"></id>
+            <result column="oname" property="oname"></result>
+            <result column="otime" property="otime"></result>
+        </collection>
+    </resultMap>
+    <select id="findUserOrder" resultMap="userMapper">
+        select * from user u,orders o where u.id = o.uid
+    </select>
+
+    <!-- 查询所有用户的多个角色，实现多对多 -->
+    <resultMap id="userRoleMap" type="user">
+        <result column="id" property="id"></result>
+        <result column="username" property="username"></result>
+        <result column="password" property="password"></result>
+        <collection property="roleList" ofType="role">
+            <id column="id" property="id"></id>
+            <id column="rolename" property="rolename"></id>
+        </collection>
+    </resultMap>
+    <select id="findUserRole" resultMap="userRoleMap">
+        select * from user u,role r,user_role ur
+        where u.id=ur.user_id and r.id=ur.role_id
+    </select>
+</mapper>
